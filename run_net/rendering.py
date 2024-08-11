@@ -5,6 +5,7 @@ import numpy as np
 video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/pp085_fast_rear.mp4'
 joint_path_xlsx = '/Users/ivory/Documents/github/gcdn_n/run_net/input/fast_rear.xlsx'
 label_path_npy = '/Users/ivory/Documents/github/gcdn_n/run_net/output/predicted.npy'
+#label_path_npy = '/Users/ivory/Documents/github/gcdn_n/run_net/labels/velocity_based/pp085/fast.npy'
 #############################################
 
 label_list = (np.load(label_path_npy)).tolist()

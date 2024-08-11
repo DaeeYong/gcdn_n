@@ -32,11 +32,12 @@ POSE_2D_JOINT_NAME_LIST = [
         'RSmallToe_x', 'RSmallToe_y', 
         'RHeel_x', 'RHeel_y'
 ]
-def get_sliding_window(input_list, window_size):
-    return [input_list[i:i + window_size] for i in range(len(input_list) - window_size + 1)]
 
 def add_number(a:int, b:int) -> int:
     return a+b
+    
+def get_sliding_window(input_list, window_size):
+    return [input_list[i:i + window_size] for i in range(len(input_list) - window_size + 1)]
 
 def remove_confidence_from_keypoints_2d(p_keypoints):
     return [value for index, value in enumerate(p_keypoints, start=1) if index % 3!= 0]
@@ -69,14 +70,15 @@ def mark_pos(img, x, y, radius = 5, color = (0, 0, 255), thickness = 2):
 
 def get_total_frame(video_path):
     cap = cv2.VideoCapture(video_path)
-    return int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    cap.release()
+    
+    return total_frames
 
 def get_jsons_list(folder_path):
     file_list = [f for f in sorted(os.listdir(folder_path)) if f.endswith('.json')]
     return file_list
-
-def save_video2Img(video, path):
-    pass
 
 def get_all_frame_data_from_jsons_list(jsons_list:list, root_dir:str) -> list :
     #3차원 배열
@@ -325,7 +327,7 @@ def play_video(video_path, video_name):
             break
     
         #현재 프레임 번호 출력
-        current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
+        current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
         print(f'current_frame : {current_frame}')
 
         cv2.imshow(video_name, frame)        
@@ -368,8 +370,7 @@ def mark_pos_on_video(video_path:str, frame_data_list : list, video_name, start_
 
     
     frame_data_max_idx = len(frame_data_list) - 1
-    joint_num = len(frame_data_list[0])
-
+    
     if not cap.isOpened():
         print(f'[Error: could not open video]:{video_path}')
         return -1
@@ -387,7 +388,7 @@ def mark_pos_on_video(video_path:str, frame_data_list : list, video_name, start_
 
         if current_frame_idx < frame_data_max_idx + 1:
             #하나의 프레임에 해당하는 위치 그리기
-            for i in range(0, joint_num, 2):
+            for i in range(0, 50, 2):
                 x = frame_data_list[current_frame_idx][i]
                 y = frame_data_list[current_frame_idx][i + 1]
 
@@ -520,6 +521,22 @@ def get_selected_joint_pos_frame_list(joint_frame_data : list, selected_joint_nu
 
     return selected_joint_frame_data_list
 
+def get_videoName_list(folder_path, video_extensions=['.mp4', '.avi', '.mkv', '.mov', '.flv', '.wmv']):
+    file_list = os.listdir(folder_path)
+    video_files = [file for file in file_list if os.path.splitext(file)[1].lower() in video_extensions]
+
+    return video_files
+
+def get_video_durationSec(video_path):
+    cap = cv2.VideoCapture(video_path)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    duration = total_frames / fps
+    
+    cap.release()
+
+    return round(duration)
 
 if __name__=="__main__":
     print(os.__version__)
