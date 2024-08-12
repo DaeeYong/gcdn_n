@@ -8,24 +8,27 @@ import json
 
 proto = '/Users/ivory/Documents/github/gcdn_n/body_25/pose_deploy.prototxt'
 weights = '/Users/ivory/Documents/github/gcdn_n/body_25/pose_iter_584000.caffemodel'
-#video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/pp085_fast_rear.mp4'
-video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/gait1_front.mp4'
+video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/pp085_fast_rear.mp4'
+#video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/gait1_front.mp4'
 img_path = '/Users/ivory/Documents/github/gcdn_n/media/iu.jpg'
 
-results = dragonY.get_results_tracking_data_from_video(video_path)
-results_list = dragonY.get_all_frame_data_list_from_yolo_results(results)
-history_list = dragonY.get_each_id_data_from_yolo_result(results_list)
-net = cv2.dnn.readNetFromCaffe(proto, weights)
+#results = dragonY.get_results_tracking_data_from_video(video_path)
+#results_list = dragonY.get_all_frame_data_list_from_yolo_results(results)
+#history_list = dragonY.get_each_id_data_from_yolo_result(results_list)
+#net = cv2.dnn.readNetFromCaffe(proto, weights)
 
-with open('./data2.json', 'w', encoding='utf-8') as file:
-    json.dump(history_list, file, ensure_ascii=False, indent=4)
+with open('./data.json', 'r', encoding='utf-8') as file:
+    history_list = json.load(file)
 
 cap = cv2.VideoCapture(video_path)
-id = 3
+id = '4'
 margin = 50
 id_data_list = history_list[id]
 now_frame_pointer = 0
 print(history_list.keys())
+
+id_data_len = len(id_data_list)
+
 # Loop through the video frames
 while cap.isOpened():
     success, frame = cap.read()
@@ -33,8 +36,12 @@ while cap.isOpened():
     if success:
         ###### Yolo rendering part########
         frame_number_idx = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
-        now_data = id_data_list[now_frame_pointer]
-        now_idx = now_data[0]
+        
+        if now_frame_pointer < id_data_len:
+            now_data = id_data_list[now_frame_pointer]
+            now_idx = now_data[0]
+        else:
+            now_frame_pointer = -1
 
         if(now_idx == frame_number_idx):
             x, y, w, h = now_data[1:]
