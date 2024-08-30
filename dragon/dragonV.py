@@ -104,7 +104,7 @@ def get_all_frame_data_from_jsons_list(jsons_list:list, root_dir:str) -> list :
     return all_frame_data
 
 #this function is for only openpose json body25 model
-def jsons2excel(json_dir_path, feature_list, key_index, file_name, save_path, json_key = "people"):
+def jsons2excel(json_dir_path, key_index, file_name, save_path, json_key = "people"):
     #create xlsx file
     workbook = xl.Workbook()
     sheet = workbook.active
@@ -537,6 +537,52 @@ def get_video_durationSec(video_path):
     cap.release()
 
     return round(duration)
+
+
+"""
+[
+    [[idx],[idx],[idx],[idx]], --> 0 frame
+    [[idx],[idx],[idx],[idx]], --> 1 frame
+    [[idx],[idx],[idx],[idx]], --> 2 frame
+    [[idx],[idx],[idx],[idx]], --> 3 frame
+    [[idx],[idx],[idx]], --> 4 frame
+                ...
+                ...
+                ...
+    [[idx],[idx],[idx]], --> n-1 frame
+    
+]
+
+
+"""
+def from_jsonfolder_to_list(json_folder_path):
+    
+    json_list = get_jsons_list(json_folder_path)
+    all_frame_data_list = []
+    
+    for each_json_name in json_list:
+        with open(json_folder_path + each_json_name, 'r', encoding='utf-8') as file:
+            each_json = json.load(file)
+
+        people_num = len(each_json['people'])
+        
+        #하나의 JSON FILE에서 모든 사람의 데이터 가져오기
+        each_json_frame_list = []
+        for idx in range(0, people_num):
+            joint_pos = each_json['people'][idx]['pose_keypoints_2d']
+            
+            each_frame = []
+            for coord in range(0, len(joint_pos), 3):
+                x = joint_pos[coord]
+                y = joint_pos[coord +1]
+                each_frame.append(x)
+                each_frame.append(y)
+                
+            each_json_frame_list.append(each_frame)
+        
+        all_frame_data_list.append(each_json_frame_list)
+    
+    return all_frame_data_list
 
 if __name__=="__main__":
     print(os.__version__)

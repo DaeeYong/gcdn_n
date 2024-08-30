@@ -5,12 +5,10 @@ from collections import defaultdict
 from dragon import dragonY
 from dragon import dragonV
 import json
+import cv2
 
-proto = '/Users/ivory/Documents/github/gcdn_n/body_25/pose_deploy.prototxt'
-weights = '/Users/ivory/Documents/github/gcdn_n/body_25/pose_iter_584000.caffemodel'
-video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/pp085_fast_rear.mp4'
+video_path = './run_net/video/pp085_fast_rear.mp4'
 #video_path = '/Users/ivory/Documents/github/gcdn_n/run_net/video/gait1_front.mp4'
-img_path = '/Users/ivory/Documents/github/gcdn_n/media/iu.jpg'
 
 #results = dragonY.get_results_tracking_data_from_video(video_path)
 #results_list = dragonY.get_all_frame_data_list_from_yolo_results(results)
@@ -25,7 +23,6 @@ id = '4'
 margin = 50
 id_data_list = history_list[id]
 now_frame_pointer = 0
-print(history_list.keys())
 
 id_data_len = len(id_data_list)
 
@@ -78,8 +75,7 @@ while cap.isOpened():
         cv2.imshow("Tracking", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-    else:
-        break
+
 
 cap.release()
 cv2.destroyAllWindows()
