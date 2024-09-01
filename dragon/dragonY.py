@@ -128,3 +128,12 @@ def get_linear_margin_to_xywh(x, y, w, h, margin_value):
 '''
 all_frame_data_list:list 에서의 xywh 데이터는 소수점이기 때문에 처리 필요.
 '''
+
+def coord_transform(x,y,w,h):
+    pt1_x = round(x - w/2)
+    pt1_y = round(y - h/2)
+
+    pt2_x = round(x + w/2)
+    pt2_y = round(y + h/2)
+
+    return pt1_x, pt1_y, pt2_x, pt2_y

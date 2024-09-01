@@ -15,14 +15,14 @@ from dragon import dragonV
 from dragon import dragonY
 from collections import defaultdict
 import json
+import cv2
 
 ##file path && constant##
-json_folder_path = '/media/yong/SAMSUNG1/json/'
+json_folder_path = '/Users/ivory/Documents/github/gcdn_n/json/'
 video_path  = '../gcdn_n/run_net/video/pp085_fast_rear.mp4'
-yolo_data_path = ''
+yolo_data_path = './data_test.json'
 
-margin = 50
-id = ''
+id = '4'
 ##openpose part##
 all_pos_data_list = dragonV.from_jsonfolder_to_list(json_folder_path)
 
@@ -50,3 +50,44 @@ else:
 ##Integration part##
 
 ##Play video##
+cap = cv2.VideoCapture(video_path)
+id_data_list = roi_list[id]
+id_data_len = len(roi_list[id])
+now_frame_pointer = 0
+if not cap.isOpened():
+    print("Error: Could not open video.")
+    exit()
+
+# 동영상 프레임을 읽어서 화면에 표시
+while True:
+    ret, frame = cap.read()
+    
+    if not ret:
+        print("Reached the end of the video.")
+        break
+    
+    ###### Yolo rendering part########
+    frame_number_idx = int(cap.get(cv2.CAP_PROP_POS_FRAMES)) - 1
+    
+    if now_frame_pointer < id_data_len:
+        now_data = id_data_list[now_frame_pointer]
+        now_idx = now_data[0]
+    else:
+        now_frame_pointer = -1
+
+    if(now_idx == frame_number_idx):
+        x1, y1, x2, y2 = now_data[1:]
+
+        pt1 = (x1, y1)    
+        pt2 = (x2, y2)
+        cv2.rectangle(frame, pt1 , pt2, color=(255, 0, 0) ,thickness=2)
+        now_frame_pointer += 1
+
+        roi = frame[y1:y2, x1:x2]
+    cv2.imshow('Video Playback', frame)
+    if cv2.waitKey(25) & 0xFF == ord('q'):
+        break
+
+# 자원 해제
+cap.release()
+cv2.destroyAllWindows()
